@@ -159,6 +159,7 @@ model User {
   notificationPreference NotificationPreference?
   portfolioItems     PortfolioItem[]
   webhooks           Webhook[]
+  pushSubscriptions  PushSubscription[] @relation("UserPushSubscriptions")
 
   referralCode       String?   @unique
   referredById       String?
@@ -602,4 +603,17 @@ model EscrowEvent {
 
   @@unique([contractJobId, eventType, ledgerSeq])
   @@index([jobId, ledgerSeq])
+}
+
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  createdAt  DateTime @default(now())
+
+  user User @relation("UserPushSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
